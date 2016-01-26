@@ -1,6 +1,7 @@
 class Integer
   def prime?
     return false if self < 2
+
     2.upto(Math.sqrt(self)).all? { |divisor| (self % divisor).nonzero? }
   end
 end
@@ -33,7 +34,10 @@ class RationalSequence
   end
 
   def each
-    enum_for(:each_rational_number).lazy.take(@size).each { |n| yield n }
+    enum_for(:each_rational_number).
+      lazy.
+      take(@size).
+      each { |n| yield n }
   end
 end
 
@@ -57,7 +61,10 @@ class FibonacciSequence
   end
 
   def each
-    enum_for(:each_fibonacci_number).lazy.take(@size).each { |n| yield n }
+    enum_for(:each_fibonacci_number)
+      .lazy
+      .take(@size)
+      .each { |n| yield n }
   end
 end
 
@@ -69,7 +76,10 @@ class PrimeSequence
   end
 
   def each
-    (1..Float::INFINITY).lazy.select(&:prime?).take(@size).each { |n| yield n }
+    (1..Float::INFINITY).lazy
+      .select(&:prime?)
+      .take(@size)
+      .each { |n| yield n }
   end
 end
 
@@ -77,26 +87,28 @@ module DrunkenMathematician
   module_function
 
   def meaningless(n)
-    RationalSequence.new(n).to_a
+    RationalSequence.new(n)
+      .to_a
       .partition { |rational| rational.numerator.prime? or rational.denominator.prime? }
       .map { |n| n.reduce(1,:*) }.reduce(&:/)
   end
 
   def aimless(n)
     prime_sequence = n.even? ? PrimeSequence.new(n).to_a : PrimeSequence.new(n).to_a << 1
-    prime_sequence.each_slice(2).map { |numerator, denominator| Rational(numerator, denominator) }
-      .reduce(0,:+)
-  end
 
-  def first_n_rationals_sum(n)
-    RationalSequence.new(n).reduce(0,:+)
+    prime_sequence.each_slice(2)
+      .map { |numerator, denominator| Rational(numerator, denominator) }
+      .reduce(0,:+)
   end
 
   def worthless(n)
     n_fibonacci_number = FibonacciSequence.new(n).to_a.last
-    max_section_length = (1..Float::INFINITY).lazy
-                           .take_while { |n| first_n_rationals_sum(n) <= n_fibonacci_number }
-                           .to_a.last
-    RationalSequence.new(max_section_length).to_a
+
+    sequence_sum = 0
+
+    RationalSequence.new(n_fibonacci_number ** 2).take_while do |rational_number|
+      sequence_sum += rational_number
+      sequence_sum <= n_fibonacci_number
+    end
   end
 end
