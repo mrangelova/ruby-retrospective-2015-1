@@ -10,6 +10,6 @@ def convert_to_bgn(price, currency)
 end
 
 def compare_prices(first_price, first_currency, second_price, second_currency)
-  convert_to_bgn(first_price, first_currency)
-    <=> convert_to_bgn(second_price, second_currency)
+  convert_to_bgn(first_price, first_currency) <=>
+    convert_to_bgn(second_price, second_currency)
 end
